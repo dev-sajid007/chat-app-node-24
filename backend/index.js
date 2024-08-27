@@ -4,13 +4,16 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { connectDB } from './config/database.js';
 import authRouter from './routes/AuthRoutes.js';
+import path from 'path';
+const __dirname = path.resolve();
+
 
 dotenv.config();
 
 //app config
 const app = express();
 const port = process.env.PORT || 3000;
-const databaseUrl = process.env.databaseUrl;
+// const databaseUrl = process.env.databaseUrl;
 
 //middleware
 app.use(cors({
@@ -18,6 +21,7 @@ app.use(cors({
     methods:["GET","POST","PUT","PATCH","DELETE"],
     credentials:true
 }));
+app.use("/uploads/profiles",express.static("uploads/profiles"));
 app.use(cookieParser());
 app.use(express.json());
 

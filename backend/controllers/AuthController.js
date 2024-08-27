@@ -1,6 +1,8 @@
 import UserModel from "../models/UserModel.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import {renameSync,unlinkSync} from "fs";
+
 const maxAge = 3 * 24 * 60 * 60 * 1000;
 
 const createToken = (email, userId) => {
@@ -155,5 +157,59 @@ export const updateProfile = async (req, res, next) => {
   } catch (error) {
     console.log("error", error.message);
     res.json({ success: false, message: "Internal Server Error!" });
+  }
+};
+
+
+export const addProfileImage =  async (req, res, next) => {
+  try {
+    
+    if (!req.file) {
+      return res.json({success:false,message:"File is required!"});
+    }
+
+    const date = Date.now();
+    let fileName = "uploads/profiles/"+date+req.file.originalname;
+    renameSync(req.file.path,fileName);
+    
+    const updatedUser = await UserModel.findByIdAndUpdate(
+      req.userId,
+      {image:fileName},
+      { new: true, runValidators: true }
+    );
+
+    res.json({
+      success: true,
+      image:updatedUser.image
+    });
+  } catch (error) {
+    console.log("error", error.message);
+    res.json({ success: false, message: "Internal Server Error!" });
+  }
+};
+
+
+export const removeProfileImage =  async (req, res, next) => {
+  try {
+    
+    const {userId} = req;
+    const user = await UserModel.findById(userId);
+    if(!user){
+      res.json({ success: false, message: "User not found!" });
+    }
+
+    if(user.image){
+      unlinkSync(user.image);
+    }
+    user.image = null;
+    await user.save();
+
+    return res.json({
+      success: true,
+      message:"Profile image remove successfully!"
+    });
+  } catch (error) {
+    console.log("error", error.message);
+    return res.json({ success: false, message: "Internal Server Error!" });
   }
 };
