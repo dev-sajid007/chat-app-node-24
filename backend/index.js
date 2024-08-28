@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import { connectDB } from './config/database.js';
 import authRouter from './routes/AuthRoutes.js';
 import path from 'path';
+import contactRouter from './routes/ContactRoutes.js';
 const __dirname = path.resolve();
 
 
@@ -30,6 +31,7 @@ connectDB();
 
 //api endpoint
 app.use("/api/auth",authRouter);
+app.use("/api/contacts",contactRouter);
 
 app.listen(port,() => {
     console.log('Server is running...');

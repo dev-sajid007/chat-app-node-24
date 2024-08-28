@@ -77,6 +77,7 @@ const Profile = () => {
   }
   const handleImageChange = async (event) => {
     const file = event.target.files[0];
+    
     if (file) {
       const formData = new FormData();
       formData.append("profile-image", file);
@@ -87,13 +88,14 @@ const Profile = () => {
       }
 
     }
+    
   }
 
   const handleDeleteImage = async () => {
     try {
       const response = await axiosClient.delete(REMOVE_PROFILE_IMAGE_ROUTE, { withCredentials: true });
-
-
+   
+      
       if (response.data.success) {
         setUserInfo({ ...userInfo, image: null });
         toast.success("Image removed successfully!");
