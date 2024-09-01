@@ -1,3 +1,5 @@
+import { useSocket } from "@/context/SocketContext";
+import { useAppStore } from "@/store";
 import EmojiPicker from "emoji-picker-react";
 import { useEffect, useRef, useState } from "react";
 import { GrAttachment } from "react-icons/gr"
@@ -6,26 +8,38 @@ import { RiEmojiStickerLine } from "react-icons/ri";
 const MessageBar = () => {
   const [message, setMessage] = useState("");
   const emojiRef = useRef();
+  const socket = useSocket();
+  const { selectedChatType, selectedChatData, userInfo } = useAppStore();
   const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
 
   useEffect(() => {
-    function handleClickOutside(event){
+    function handleClickOutside(event) {
       if (emojiRef.current && !emojiRef.current.contains(event.target)) {
         setEmojiPickerOpen(false);
       }
     }
-    document.addEventListener("mousedown",handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown",handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     }
-  },[emojiRef]);
+  }, [emojiRef]);
 
   const handleAddEmoji = (emoji) => {
     setMessage((msg) => msg + emoji.emoji);
   }
 
   const handleSendMessage = async () => {
+    // console.log(selectedChatData);
     
+    if(selectedChatType === "contact"){
+      socket.emit("sendMessage",{
+        sender:userInfo.id,
+        content:message,
+        recipient:selectedChatData._id,
+        messageType:"text",
+        fileUrl:undefined
+      });
+    }
   }
 
   return (
@@ -41,7 +55,7 @@ const MessageBar = () => {
         </button>
         <div className="relative">
           <button className='text-neutral-500 focus:border-none focus:text-white focus:outline-none duration-300 transition-all'
-          onClick={() => setEmojiPickerOpen(true)}
+            onClick={() => setEmojiPickerOpen(true)}
           >
             <RiEmojiStickerLine className="text-2xl" />
           </button>
@@ -56,10 +70,10 @@ const MessageBar = () => {
         </div>
       </div>
       <button className='bg-[#8417ff] rounded-md flex items-center justify-center p-5 focus:border-none focus:text-white focus:outline-none duration-300 transition-all hover:bg-[#741bda] focus:bg-[#741bda]'
-      onClick={handleSendMessage}
+        onClick={handleSendMessage}
       >
-          <IoSend className="text-2xl" />
-        </button>
+        <IoSend className="text-2xl" />
+      </button>
     </div>
   )
 }

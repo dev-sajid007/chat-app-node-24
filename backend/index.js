@@ -6,6 +6,8 @@ import { connectDB } from './config/database.js';
 import authRouter from './routes/AuthRoutes.js';
 import path from 'path';
 import contactRouter from './routes/ContactRoutes.js';
+import setupSocket from './socket.js';
+import messageRouter from './routes/messagesRoutes.js';
 const __dirname = path.resolve();
 
 
@@ -32,7 +34,16 @@ connectDB();
 //api endpoint
 app.use("/api/auth",authRouter);
 app.use("/api/contacts",contactRouter);
+app.use("/api/messages",messageRouter);
 
-app.listen(port,() => {
+app.get("/",(req,res) => {
+    res.send("Server is running...");
+});
+
+const server = app.listen(port,() => {
     console.log('Server is running...');
 });
+
+//connect socket
+setupSocket(server);
+
