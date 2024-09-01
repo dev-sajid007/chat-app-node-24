@@ -33,8 +33,7 @@ export const SocketProvider = ({ children }) => {
                 ){
                     console.log("message Rcv",message);
                     addMessage(message);
-                }
-
+                }   
             }
 
             socket.current.on("receiveMessage", handleReceiveMessage);
